@@ -1,0 +1,91 @@
+
+/* 角色音量 */
+#menu-sound .character-section {
+  text-align: center;
+}
+
+/* 气泡音量 */
+#menu-sound .bubble-section {
+  text-align: center;
+}
+
+/* 背景音量 */
+#menu-sound .backmusic-section {
+  text-align: center;
+}
+
+/* 音量测试设置 */
+#menu-sound .test-section {
+  display: flex;
+  justify-content: center;
+  padding: 0 1%;
+}
+#menu-sound .test-button {
+  box-sizing: border-box;
+  padding: 1%;
+  width: 50%;
+}
+
+/* 背景音乐设置 */
+#menu-sound .music-section {
+  background-color: rgb(234 234 234);
+  box-sizing: border-box;
+  padding: 1%;
+  border-radius: 3px;
+  display: inline-flex;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
+  width: calc(100% - 145px - 95px);
+}
+.Music-List {
+  margin: 0 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #d1d5db;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+.Music-List {
+  margin: 0 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #d1d5db;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+.Music-List {
+  margin: 0 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #d1d5db;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.Music-List.a {
+  border-radius: 15px 15px 0 0;
+}
+
+.Music-List.b {
+  min-height: 25vh;
+  border-radius: 0;
+}
+
+.Music-List.c {
+  border-radius: 0 0 15px 15px;
+}
+
+#menu-sound .music-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#menu-sound .music-add {
+  background-color: rgba(255, 0, 0, 0.8);
+  width: unset;
+  padding: 10px 20px;
+  color: white;
+}

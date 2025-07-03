@@ -1,0 +1,115 @@
+#intertool-chat {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 14, 39, 0.7) 0%,
+    rgba(0, 14, 39, 0.6) 100%
+  );
+  bottom: 0;
+  padding: 15px;
+  backdrop-filter: blur(1px);
+}
+
+/* 顶部渐变透明效果 */
+#intertool-chat::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 14, 39, 0.3) 50%,
+    rgba(0, 14, 39, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+#intertool-chat .content {
+  width: 60%;
+  height: 240px;
+}
+
+#intertool-chat .head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+#intertool-chat .title {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin-right: 15px;
+}
+
+#intertool-chat .subtitle {
+  font-size: 20px;
+  font-weight: bold;
+  color: #6eb4ff;
+}
+
+#intertool-chat .emotion {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff77dd;
+  margin: auto;
+}
+
+#intertool-chat .line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 6px 0 6px 0;
+}
+
+#intertool-chat .body {
+  display: flex;
+  flex-direction: column;
+  white-space: pre-line; /* 保留 \n 并换行 */
+}
+
+#intertool-chat .text {
+  font-family: "TanukiMagic", "方正喵呜", "Segoe UI", sans-serif;
+  width: 100%;
+  min-height: 40px;
+  background: rgba(255, 255, 255, 0);
+  border: none;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  resize: none;
+  margin: 5px 0px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+#intertool-chat .text::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#intertool-chat .button {
+  align-self: flex-end;
+  background: rgba(0, 14, 39, 0);
+  color: rgb(4, 188, 255);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+#intertool-chat .button:hover {
+  background: rgba(0, 14, 39, 0);
+  color: rgba(136, 255, 251, 0.827);
+}
+
+#intertool-chat .button:disabled {
+  background: #333;
+  cursor: not-allowed;
+  opacity: 0.7;
+}

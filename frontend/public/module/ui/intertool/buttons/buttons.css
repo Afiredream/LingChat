@@ -1,0 +1,35 @@
+#intertool-buttons {
+  margin: 1%;
+  text-align: right;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#intertool-buttons button {
+  padding: 12px 20px;
+  background-color: #d2e5ff;
+  color: #3d8dff;
+  font-size: 20px;
+  font-weight: bold;
+  border: 0.5px solid #e5ecf1;
+  /* 银灰色边框 */
+  border-radius: 8px;
+  /* 稍微增大圆角 */
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  /* 底部阴影 */
+  transition: all 0.3s ease;
+  /* 添加过渡效果 */
+}
+
+#intertool-buttons button:hover {
+  background-color: #b8d7ff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* 悬停时阴影更明显 */
+  transform: translateY(-2px);
+  /* 轻微上浮效果 */
+}
+ 

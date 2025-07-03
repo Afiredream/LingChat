@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>钦灵 Chat</title>
+    <link
+      rel="icon"
+      href="../pictures/icons/小猫Ling.svg"
+      type="image/svg+xml"
+    />
+  </head>
+  <body>
+    <div id="animation-ears">
+      <div class="ears">
+        <div class="ear ear-left"></div>
+        <div class="ear ear-right"></div>
+      </div>
+      <div class="text">你的小可爱正在准备中</div>
+      <style>
+        /* --- 加载动画容器 --- */
+        #animation-ears {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(
+            135deg,
+            #e0e7ff,
+            #c7d2fe
+          ); /* 淡蓝色到淡紫色的渐变背景 */
+          opacity: 1;
+          transition: opacity 0.8s ease-out; /* 淡出效果 */
+          z-index: 999;
+        }
+
+        /* --- 兽耳容器 --- */
+        #animation-ears .ears {
+          position: relative;
+          width: 150px;
+          height: 80px;
+          animation: bounce 2.5s infinite ease-in-out; /* 耳朵上下轻微浮动 */
+        }
+
+        @keyframes bounce {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        /* --- 单个耳朵的样式 --- */
+        #animation-ears .ear {
+          position: absolute;
+          bottom: 0;
+          width: 55px;
+          height: 80px;
+          background-color: #ffffff; /* 白色耳朵 */
+          border: 3px solid #a5b4fc; /* 蓝色轮廓 */
+          /* 使用clip-path创建三角形狼耳形状 */
+          border-radius: 51% 49% 45% 55% / 100% 100% 0% 0%;
+          box-shadow: 0 4px 15px rgba(165, 180, 252, 0.3);
+        }
+
+        #animation-ears .ear::before {
+          content: "";
+          position: absolute;
+          top: 21px; /* 调整内耳位置 */
+          left: 50%;
+          transform: translateX(-50%);
+          width: 25px; /* 内耳宽度 */
+          height: 50px; /* 内耳高度 */
+          background-color: #fbcfe8; /* 粉色内耳 */
+          /* 内耳也是三角形，但更小 */
+          border-radius: 51% 49% 45% 55% / 100% 100% 0% 0%;
+        }
+
+        #animation-ears .ear-left {
+          left: 10px;
+          transform-origin: bottom center;
+          transform: rotate(-15deg);
+          animation: wag-left 2.5s infinite ease-in-out; /* 左耳晃动 */
+        }
+
+        #animation-ears .ear-right {
+          right: 10px;
+          transform-origin: bottom center;
+          transform: rotate(15deg);
+          animation: wag-right 2.5s infinite ease-in-out; /* 右耳晃动 */
+        }
+
+        /* --- 耳朵晃动的动画 --- */
+        @keyframes wag-left {
+          0%,
+          100% {
+            transform: rotate(-15deg);
+          }
+          50% {
+            transform: rotate(-25deg);
+          }
+        }
+
+        @keyframes wag-right {
+          0%,
+          100% {
+            transform: rotate(15deg);
+          }
+          50% {
+            transform: rotate(25deg);
+          }
+        }
+
+        /* --- 加载文字样式 --- */
+        #animation-ears .text {
+          margin-top: 30px;
+          font-size: 1.2em;
+          color: #4338ca; /* 深蓝色文字 */
+          font-weight: 500;
+          text-shadow: #474747;
+        }
+
+        /* 文字后面的动态点 */
+        #animation-ears .text::after {
+          content: ".";
+          animation: dots 1.4s infinite;
+        }
+
+        @keyframes dots {
+          0%,
+          20% {
+            content: ".";
+          }
+          40% {
+            content: "..";
+          }
+          60%,
+          100% {
+            content: "...";
+          }
+        }
+      </style>
+      <script>
+        window.addEventListener('load', event => {
+          setTimeout(() => {
+            document.querySelector('#animation-ears').style.opacity = '0'
+          },1000)
+          
+        }, {once: true})
+        document.querySelector('#animation-ears').addEventListener('transitionend', event => {
+          document.querySelector('#animation-ears').remove()
+        })
+      </script>
+    </div>
+    <script type="module" src="../module/app.js"></script>
+  </body>
+</html>

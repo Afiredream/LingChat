@@ -1,0 +1,162 @@
+
+/* 大按钮 */
+#menu .big-button {
+  margin-bottom: 5px;
+  width: 100%;
+  padding: 8px 15px;
+  background-color: #5d7eb6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+  display: block;
+  align-items: center;
+  text-decoration: none;
+}
+#menu .big-button:hover {
+  background-color: #4a699e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+#menu .big-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* 中按钮 */
+/* 小按钮 */
+/* 关闭按钮 */
+/* 删除按钮 */
+
+
+/* 胶囊型开关 */
+#menu .toggle {
+  text-align: center;
+  display: block;
+  position: relative;
+  margin: 5px 0;
+}
+#menu .toggle input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+#menu .toggle label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal;
+  margin-left: 60px;
+  position: relative;
+  color: black;
+}
+#menu .toggle label:before {
+  content: "";
+  width: 50px;
+  height: 24px;
+  background: #e0e0e0;
+  position: absolute;
+  left: -60px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+#menu .toggle label:after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: white;
+  position: absolute;
+  left: -58px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 轨道滑块 */
+#menu .slider input[type="range"] {
+  background-color: rgb(200 200 200);
+  vertical-align: middle;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90%;
+  margin: 10px 0;
+  background-color: transparent;
+  position: relative;
+  outline: none;
+  border-radius: 3px;
+}
+
+/* 滑块轨道样式 */
+#menu .slider input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to left, #3d8dff, #a8caff);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* 滑块轨道悬停效果 */
+#menu input[type="range"]:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(to left, #5a9dff, #c4ddff);
+  height: 10px;
+}
+
+/* 滑块容器样式 */
+#menu input[type="range" i]::-webkit-slider-container {
+  height: 30px;
+  overflow: visible;
+}
+
+/* 滑块拇指样式 */
+#menu input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: grab;
+  border: 2px solid #3d8dff;
+  margin-top: -7px;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: center;
+  box-shadow: 0 2px 8px rgba(61, 141, 255, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+/* 滑块悬停和激活状态效果 */
+#menu input[type="range"]::-webkit-slider-thumb:hover,
+#menu input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+  background-color: #f8fbff;
+  border-color: #5a9dff;
+  box-shadow: 0 0 12px rgba(61, 141, 255, 0.5);
+}
+
+#menu input[type="range"]:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  background-color: #e6f0ff;
+  border-width: 3px;
+}
+
+
+/* 菜单滑块样式 */
+
+/* Firefox浏览器 */
+#menu input[type=range]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #3498db;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+
+
