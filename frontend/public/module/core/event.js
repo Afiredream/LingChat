@@ -33,3 +33,5 @@ class EventBus {
 
 const eventBusInstance = new EventBus();
 export default eventBusInstance;
+window.EventBus = eventBusInstance;
+
