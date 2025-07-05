@@ -1,87 +1,85 @@
-# v0.4.0 版本更新前瞻
-
-![b3377564da7e05ecf2600aaae896db66](https://github.com/user-attachments/assets/25dac3ec-7cf7-4675-819c-a055e4b3b928)
-
-# 一、LingChat 0.4 要做什么？
-
-在LingChat 0.1，我们完成了一个使用仿碧蓝档案UI的，有语音和立绘切换的，和AI聊天的系统。
-
-在LingChat 0.2，我们给系统添加了RAG实现跨越对话的永久记忆，时间感知，以及存档读档功能
-
-在LingChat 0.3，我们完善了各个功能，添加了多人物支持，创意工坊，音乐和背景导入，使得LingChat 可以被深度自定义，并增加了易用性。
-
-至此，一个“使用仿碧蓝档案UI的，有语音和立绘切换的，和AI聊天的系统”已经完善，是时候做一些前人没有做过的东西了。
+# 🐈✨ LingChat - 灵动の人工智能聊天陪伴助手
+![official](https://github.com/user-attachments/assets/ffccbe79-87ed-4dbc-8e60-f400efbbab26)
 
 
+## 🖥️ 支持操作系统：
+Windows、Linux均可运行。Linux用户请查看额外的使用说明。
 
-在LingChat 0.4，我们将会为LingChat添加以下功能。
+## 🛠 功能列表
+- [x] 选择你喜欢的人物，陪伴你聊天度过寂寞的夜晚
+- [x] 内嵌永久记忆功能，优化和高自定义的RAG系统记录你们的一点一滴
+- [x] 使用自训练的AI情绪识别模型，自动判定AI的每次对话情绪
+- [x] 表情，动作，气泡随着AI的情绪改变，提供灵活的AI聊天体验
+- [x] 非RAG下有存档功能，用不同的方式攻略Galgame人物吧
+- [x] 搭配Vits语音服务或对话音效，用真实的耳语调动你的真心
+- [x] 支持自定义角色，可以用自己的oc或者游戏人物与自己对话
+- [x] 清爽的设置菜单，高度自定义的设置选项，可搭配不同背景和音乐聊天
 
-- **长线剧情系统**：支持使用类似galgame的剧情预设，直接兼容传统galgame的预设剧本和分歧选择，同时支持将一部分甚至全部的剧情**由AI驱动**。你将在剧情内日常的场合，停下来和主角自由的谈心，聊够了在继续剧情；你将不再局限于点击选项来选择剧情分歧，而是真正进入故事，说出你想说的话，影响主角做出重要选择，或者**劝说**主角真正的回心转意。
-- **剧本杀/跑团模式**：支持使用类似剧本杀/跑团模式的剧情预设，由一个DM（主持人）来掌控剧情的发展，你将体验到诸如随着时间的推移获得越来越多的信息，判断“谁是凶手”，等类剧情游戏
-- **随机事件生成器**：轻量化的剧情引导，如你和你的oc探索地下迷宫的过程中，由LLM生成你们下一个房间的见闻
-- **大量的预设小游戏**：和你的一个甚至多个oc人设玩一把狼人杀，真心话大冒险，甚至恶魔轮盘赌等经典互动游戏
+## ⭐ 快速上手
 
-这些功能互不冲突需要一个从头开始精心设计的框架，所以这些功能不会逐次更新，而是在不停排查兼容性调优后，设计一个兼容这些所有模式的核心逻辑，讲这些功能**一次性全部实现**。
+### Step 0: 开始之前的准备
+- 在DeepSeek或者其他大模型网站中，申请自己的API密钥，并且保证有余额拱使用 -> [DeepSeek的官方API获取网站](https://platform.deepseek.com/)
 
-我们还会编写可视化剧情编辑系统，编写详尽的说明文件，让所有人可以编写出属于自己的，可以参与其中的故事——LingChat 0.4，更接近于一个“剧情编辑器”+“剧情渲染器”，提供一个AI时代的剧情展现平台。
+### Step 1: 下载软件
+- 在[release](https://github.com/SlimeBoyOwO/LingChat/releases)中，找到最新的版本，下载如 `LingChat.x.x.x.7z` 的文件，下载完成后解压它。
+- 点击 `LingChat.exe` 启动程序
 
-# 二、其他零碎的工作计划
+### Step 2: 首次启动配置
+- 启动程序后，点开右上角的菜单，点击【文字】部分的【进入设置页面】按钮，输入自己选用的大模型类型和API，模型信息等（**这些是必填信息**）
+- 设置完毕后，滑动到最下方，点击保存配置。关闭黑不溜秋的窗口和LingChat程序，重新点击 `LingChat.exe` 启动程序，就可以使用啦！
+> [!IMPORTANT]
+>
+> 1. **有些用户的电脑启动`LingChat.exe`之后会无限卡在加载页，请在现代浏览器如谷歌中中输入`localhost:8765`进入程序**
+> 2. **当你关闭程序准备重启初始化时候，务必保证前端和后端都关闭（exe或者浏览器的网页，还有cmd窗口），否则可能出现进去人物消失的情况**
 
-## 帮助文档编写
+### Step 3：基础语音功能使用（从这里开始的以下步骤属于扩展功能，按需进行）
+- 若要使用 `Vits` 语音功能，请下载链接程序[simple-vits-api](https://github.com/Artrajz/vits-simple-api)。
+- 该项目实现了基于 `Vits` 的简单语音合成 API。如果你是核显只能下载CPU版本。如果有独显建议下载 GPU 版本，速度快。
+- 程序默认监听 23456 语音端口，程序默认导入的模型是 zcchat 地址->讨论区->角色示范（丛雨）-> vits
+- 模型下载好之后在 simple-vits-api 的目录的/data/models 里面解压，再启动就 ok 了
+- 如果需要使用其他角色声线，请在`game_data/characters/角色名/settings.txt`中修改`speaker_id`这个属性（0~6可选）
 
-- 编写详细的帮助文档，包括小白教程和开发须知，使用超链接在 Readme 引用
-  - [Linux 部署教程](others/document/Linux部署教程.md)
-  - [Release 部署教程](others/document/Release部署教程.md)
-  - [开发文档](others/document/开发文档.md)
+### Step 4：视觉模型功能使用
+- 从通义千问或者其他拥有视觉感知的大模型网站中，获取API -> [阿里云的相关视觉模型API获取网站](https://bailian.console.aliyun.com/?tab=api#/api)
+- 在设置中的 `VD_API_KEY` 和 `VD_MODEL_TYPE` 中输入自己的密钥和模型类型，该API默认赠送额度，不需要充值， *而且对于这个项目肯定够用一辈子了* 。
+#### 温馨提示：
+> 设定完毕后，可以通过在与AI对话的对话中，包含 `“看桌面”` 或者 `“看看我的桌面”` 来触发视觉感知，允许AI观察你的屏幕并做出回应
 
-## 长剧情功能更新
+### Step 5: 扩展语音功能使用（Style-Bert-Vits2模型使用，更好的音色，可自定义训练）
+- 从下方相关链接中，下载Style-Bert-Vits2的 [Release](https://github.com/litagin02/Style-Bert-VITS2/releases) 的 **最新版本** ，解压
+- 先决定这个软件（安装后12GB）的安装位置，然后启动里面的`Install-Style-Bert-VITS2.bat`文件（如果之后更改这个软件的位置会有Bug）
+- 耐心等待很长时间后，这个软件会安装好。由于这个项目庞大，所以等待时间非常长
+- 下载完毕后，在 `model_assests` 目录中，把下载好的Bert-Vits模型解压进去
+- 打开程序的目录，里面有个 `server.bat` ，启动它即可使用
+#### 温馨提示：
+> 要是想使用这个功能，需要在 `game_data/characters/<角色名>/settings.txt` 中设定 `model_name` 的参数为导入的模型的名字   
+> 模型的名字可以通过启动`app.bat`中的人物列表中查看
 
-- **场景 CG 联动**：添加将场景 CG 以 prompt 发送到 llm 的功能，以及随着剧情推进改变场景 CG 的功能。
-  - 实现 CG 影响对话，如，在场景为卧室 CG 时向 llm 发送：“现在你们在卧室里，时间是晚上”。此外，要给予 AI 自行改变场景的能力，如随剧情推进，场景从卧室切换为学校，或者同场景傍晚切换到黑夜。**此功能为长线剧情更新的必要前置**
-  - 注意，由于已经有了发送系统时间功能，配置文件中应提供选项，使用系统时间，使用 CG 时间，不发送时间；此外，考虑增加随系统时间切换 CG（白天 → 黄昏 → 夜晚）功能。
-- **大地图功能**：考虑添加大地图功能，例如，点击“家”就回家，点击“学校”就去学校，同时影响 CG 和对话，可能还会影响剧情。这里可以参考夏日口袋的大地图与长线剧情线设计。
+### Step 6: 加入最新版的测试
+- 我们一直在更新LingChat，所有更新都会随时推送到[develop](https://github.com/SlimeBoyOwO/LingChat/tree/develop)中，我们也会在[issuse](https://github.com/SlimeBoyOwO/LingChat/issues)中发布开发日志。
+- 你可以参考[源代码使用教程](https://github.com/SlimeBoyOwO/LingChat/blob/develop/others/document/%E6%BA%90%E4%BB%A3%E7%A0%81%E4%BD%BF%E7%94%A8.md)来使用LingChat的源代码，并随时获取最新的develop开发版更新。
+- 开发版是不稳定的版本，如果遇到任何Bug，欢迎向我们反馈！
 
-## 陪伴系功能更新
+## 🔗 相关 & 致谢链接
 
-- **桌宠启动模式**✅：开发轻量化的启动模式，只有人物，无边框，可选方形背景或背景透明，会显示在桌面顶层
-- **添加视觉能力**✅：添加多模态支持，让 AI 拥有桌面视野，后续基于多模态视觉开发各种陪伴功能。若 DeepSeek 迟迟不更新原生多模态，可以考虑使用 Qwen
+- [Zcchat](https://github.com/Zao-chen/ZcChat): 本项目的灵感来源，可以在这里找到 `Vits` 模型和人物素材。可以的话也帮他们点个stars吧❤
+- [Simple-Vits-API](https://github.com/Artrajz/vits-simple-api): 该项目实现了基于 `VITS` 的简单语音合成 API。如果你不是核显建议下载 GPU 版本，速度快。核显就用CPU。
+- [Style-Bert-VITS2](https://github.com/litagin02/Style-Bert-VITS2)：该项目实现了 `Bert-VITS` 的语音合成和训练，你可以用这个进行语音训练和推理，少量数据量就可以达到很棒效果！
+- [ProgrammingVTuberLogos](https://github.com/Aikoyori/ProgrammingVTuberLogos)：LingChat 的标题风格，可爱滴捏，画风参考这个项目~
+- 本项目的实现离不开这些优秀开源作品的先驱者，在这里我们送上由衷的致谢🌼
 
-## 系统底层设计与优化
+## 🌸 一些小话
 
-- **llm 接口重构✅**：重构 deepseek.py，分别兼容以下接口：
-  - DeepSeek，Qwen，GPT，Claude，Gemini 官方接口
-  - 支持多模态传输的标准格式第三方 OpenAI 请求
-  - 标准 Ollama，LM Studio 本地部署接口
-  - 未来可不断扩展新增的接口格式
-- **手机适配**：重构前端界面，适配手机 UI，未来可能登录官方服务器使用；若有安卓开发成员，可以考虑开发轻量化的手机版本
-- **语音接口**：添加 GPTSoVIS 以及其他主流语音实现的支持
-- **网络接口**：添加可以在网络获取信息的接口，可能可以实现：
-  - 官方团队维护和发布的虚拟世界突发事件，让 LingChat 宇宙的事件演进
-  - 日报功能，通过可靠的稳定的信源，再完善一套好用的 Prompt，以角色的性格和口吻播报当日新闻/本周新闻
-  - 可能的后续其他功能
-- **角色切换**✅：增加 AI 角色切换功能，增加 AI 名称修改
-- **设置窗口**✅：用可视化的设置 UI 代替手动修改.env
-- **启动速度优化**：取消重量级库的依赖，优化启动速递
-- **永久记忆更新**：添加可以一建清除 RAG 缓存的.bat
-- **启动动画添加✅**：在启动时添加日志动画，以点缀跳过漫长的启动等待
-- **依赖去除✅**：本地化 RAG，取消必须连接抱脸的限制
-- **降低延迟**：将语音改为流式传输，减少等待时间
+- 本项目为了快速开发用了很多 AI 工具，有做的不好的地方欢迎指出！我们欢迎各位开发者或用户提出issues！
+- 感谢一路结识的开发者，都是 **香软可爱** 又厉害的大佬们~ 如果你有开发意向可以联系我！开发者群号就藏在GitHub中❤
+- 本项目更多作为一个超小型的学习项目，由于文件结构非常简单， ~~欢迎有兴趣的人学习~~ 。现在变大了，应用了很多软件工程的架构思想，也欢迎学习啦qwq
 
-## 服务器与团队规划
+## 🔍 其他
 
-- **新成员招募**：在新视频发布招募公告
-- **服务器维护团队**
-  - 维护 LingChat 项目的官方服务器
-  - 维护和发布的虚拟世界突发事件，让 LingChat 宇宙的事件演进
-- **AI 炼丹师**
-  - 制作/训练新人物的 vits 语音
-  - 使用 AI 绘制大量的场景 CG 和人物立绘
-  - 制作符合 LingChat 画风的 CG 和人物 lora，搭建 ComfyUI 工作流，通过 controlnet 实现通过输入人物提示词就直接生成 18 个差分表情，以支持用户的立绘自定义，直接导入本项目（tip：这确实是可以实现的）
-- **编剧**
-  - 编写长线剧情和新人设
-- **画手**
-  - 需要对大量使用 AI 工具有包容心——大部分画手不能容忍 AI 工具
+> 本项目使用的气泡+音效素材来源于碧蓝档案，其中对话哔哔音效来源于Undertale，请勿商用  
+> 默认简单狼狼立绘是自绘，表情差分源于 AI + 人工修改，如果你想自己创作可使用 Novelai 网站或者自己画
+> 请对AI生成的东西和使用负责，不要肆意传播不良信息   
+> 有其他问题可以 B 站私信捏~
 
-# Collaborator
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section --> <!-- prettier-ignore-start --> <!-- markdownlint-disable --> <table> <tbody> <tr> <td align="center" valign="top" width="25%"> <a href="https://github.com/SlimeBoyOwO"><img src="https://avatars.githubusercontent.com/SlimeBoyOwO?s=100" width="100px;" alt="SlimeBoyOwO"/><br /><sub><b>钦灵</b></sub></a><br /> </td> <td align="center" valign="top" width="25%"> <a href="https://github.com/T-Auto"><img src="https://avatars.githubusercontent.com/T-Auto?s=100" width="100px;" alt="T-Auto"/><br /><sub><b>风雪</b></sub></a><br /> </td> <td align="center" valign="top" width="25%"> <a href="https://github.com/Vickko"><img src="https://avatars.githubusercontent.com/Vickko?s=100" width="100px;" alt="Vickko"/><br /><sub><b>vickko</b></sub></a><br /> </td> <td align="center" valign="top" width="25%"> <a href="https://github.com/0x00-pl"><img src="https://avatars.githubusercontent.com/0x00-pl?s=100" width="100px;" alt="0x00‑pl"/><br /><sub><b>PL</b></sub></a><br /> </td> </tr> </tbody> </table>
+© LingChat 制作团队
