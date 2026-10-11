@@ -296,6 +296,7 @@ impl StrategyDispatcher {
             .and_then(|role| role.display_name.clone())
             .unwrap_or_else(|| "你".to_string());
 
+        // 天气由首聊台词与 query_weather 工具按需提供。
         format!("{{ {} 想继续说话了}}", ai_name)
     }
 }

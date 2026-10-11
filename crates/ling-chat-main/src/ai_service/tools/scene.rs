@@ -59,9 +59,27 @@ pub struct SceneSwitch;
 #[async_trait]
 impl Tool for SceneSwitch {
     fn definition(&self) -> ToolDefinition {
+        // 把当前可用场景名直接写进描述，模型无需先调 scene_list 就知道有哪些
+        // 场景——这是"用户提到地点 → 后台匹配切景"主动行为的前提。
+        let scene_names = SceneStore::new(&data_dir())
+            .load_all()
+            .map(|scenes| {
+                scenes
+                    .iter()
+                    .map(|s| s.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join("、")
+            })
+            .unwrap_or_default();
         ToolDefinition::new(
             "scene_switch",
-            "切换到指定场景，可按场景 ID 或场景名称指定",
+            format!(
+                "切换到指定场景。当前可用场景：{scene_names}。\
+                 当用户提到自己所在的地点（如「我现在在占卜摊」）、或时间氛围发生变化\
+                 （入夜、清晨、下雨）时，可主动切换到名称最匹配的场景，无需用户指示；\
+                 找不到明确对应的场景就不要切换。若工具返回 locked（用户手动锁定过场景），\
+                 任何调用都不会执行——不要再尝试，可提示用户在设置中重新打开自动切换"
+            ),
             json!({
                 "type": "object",
                 "properties": {
@@ -92,6 +110,21 @@ impl Tool for SceneSwitch {
             ));
         }
 
+        let app = context.require_app()?;
+
+        // 手动优先（硬边界）：用户手动选过场景后，AI 的切景请求一律不执行；
+        // 恢复自动切景的唯一途径是用户在设置页重新打开开关
+        let auto_allowed = crate::config::AppConfig::load(&app)
+            .map(|c| c.ai_auto_scene)
+            .unwrap_or(true);
+        if !auto_allowed {
+            return Ok(json!({
+                "success": false,
+                "locked": true,
+                "message": "用户已手动选择当前场景并关闭了自动切换，本次及后续的切景调用都不会执行。请自然接受，不要反复尝试；若用户想恢复自动切景，可提示其在设置中重新打开",
+            }));
+        }
+
         let store = SceneStore::new(&data_dir());
         let scenes = store
             .load_all()
@@ -107,7 +140,6 @@ impl Tool for SceneSwitch {
         };
         let scene_id = scene.id.clone();
 
-        let app = context.require_app()?;
         let gs = game_status_handle(&app).await;
         let mut gs = gs.lock().await;
         gs.current_scene_id = Some(scene_id.clone());
