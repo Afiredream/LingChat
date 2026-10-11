@@ -1,5 +1,6 @@
 pub mod agent;
 pub mod background_command;
+pub mod background_effect;
 pub mod character;
 pub mod clock;
 pub mod executor;
@@ -29,6 +30,7 @@ use tokio::sync::Mutex;
 use crate::AppState;
 use crate::ai_service::game_system::game_status::GameStatus;
 
+use background_effect::SetBackgroundEffect;
 use character::{CharacterGetClothes, CharacterList, CharacterSetClothes, CharacterSwitch};
 use clock::CurrentTimeTool;
 use memory::{AddNote, DeleteNote, GetCurrentMemory, GetNotes, UpdateNote};
@@ -36,7 +38,7 @@ use permissions::CONFIG_FILE_NAME;
 use permissions::ToolPermissionConfig;
 use read_media_file::ReadMediaFileTool;
 use registry::ToolRegistry;
-use scene::{SceneList, SceneSwitch, SetBackgroundEffect};
+use scene::{SceneList, SceneSwitch};
 use schedule::{AddTodo, DeleteTodo, GetAllSchedule, UpdateTodo};
 use settings::SharedToolSettings;
 #[cfg(desktop)]

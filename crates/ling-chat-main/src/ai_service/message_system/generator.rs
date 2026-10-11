@@ -261,6 +261,8 @@ impl MessageGenerator {
             tracing::error!("生成消息的时候没有当前角色，取消生成");
             return Ok(Vec::new());
         };
+        // 今日首聊天气先入列，再取 memory，保证本轮上下文就能看到这条提醒
+        self.inject_weather_first_talk(&mut gs).await;
         let role = gs.get_role(&self.deps.db, rid).await?;
         // 好感度不再逐轮注入上下文；变化时以旁白台词写入历史（见 maybe_evaluate_affection）
         let mut context = role.memory.clone();
@@ -269,32 +271,32 @@ impl MessageGenerator {
             book.inject(&mut context, user_input);
         }
         drop(gs);
-        self.inject_weather_first_talk(&mut context);
         Ok(context)
     }
 
-    /// 今日首次对话时，把天气提醒追加进当轮上下文（仅本轮可见，不写回记忆）。
+    /// 今日首次对话时，往 game_status 添加一条「系统」天气台词。
     ///
-    /// 剧本系来源（AI 对话/自由对话事件）与编辑器试玩不注入；其余自由对话
-    /// 场景由 `first_talk_reminder` 内部的"每日一次 + 配置开关 + 缓存有货"
-    /// 三重门决定是否真正注入。追加到最后一条 user 消息上，与 processor
-    /// 时间感知的 `系统提醒` 格式保持一致。
-    fn inject_weather_first_talk(&self, context: &mut Vec<LlmMessage>) {
+    /// 遵循项目约定《永远不要插入第二条 system 类型的消息》：不手工拼
+    /// LlmMessage，而是与场景切换旁白同样通过 `add_line` 入列，由正常管线
+    /// 进入角色记忆。剧本系来源（AI 对话/自由对话事件）与编辑器试玩不注入；
+    /// 其余场景由 `first_talk_reminder` 内部的"每日一次 + 配置开关 + 缓存有货"
+    /// 三重门决定是否真正添加。
+    async fn inject_weather_first_talk(&self, gs: &mut GameStatus) {
         let script_source = matches!(
             self.deps.source,
             GeneratorSource::ScriptAiDialogue | GeneratorSource::ScriptFreeDialogue
         );
         let allowed = !script_source && !self.deps.is_preview;
         if let Some(reminder) =
-            crate::ai_service::tools::weather::first_talk_reminder(&self.deps.app, allowed)
+            crate::ai_service::tools::weather::first_talk_reminder(&self.deps.app, gs, allowed)
         {
-            match context.last_mut() {
-                Some(last) if last.role == "user" => {
-                    last.content
-                        .push_str(&format!("\n{{系统提醒: {reminder}}}"));
-                },
-                _ => context.push(LlmMessage::system(reminder)),
-            }
+            let line = LineBase {
+                content: PromptRole::Narrator.build_prompt(&reminder),
+                attribute: LineAttributeExt(LineAttribute::User),
+                display_name: Some("系统".to_string()),
+                ..Default::default()
+            };
+            let _ = gs.add_line(&self.deps.db, line).await;
         }
     }
 

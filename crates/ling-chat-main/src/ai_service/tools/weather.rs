@@ -1,45 +1,62 @@
 use async_trait::async_trait;
-use once_cell::sync::Lazy;
 use serde_json::{Value, json};
-use std::sync::Mutex;
-use std::time::{Duration, Instant};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri_plugin_store::StoreExt;
 
+use crate::ai_service::game_system::game_status::GameStatus;
 use crate::ai_service::types::ToolDefinition;
 use crate::config::AppConfig;
 
 use super::executor::{Tool, ToolContext, ToolError, ToolResult};
+use super::game_status_handle;
 
-/// ============ 天气上下文缓存 ============
-///
-/// 天气感知定位为"环境上下文"而非"问答工具"：模型应该随时知道外面什么天气
-/// （像知道当前时间一样），而不是被问到才临时查。缓存在两处被填充——
-/// query_weather 工具执行成功时、后台刷新循环（run_refresh_loop）定时拉取时；
-/// 消息处理器（processor.rs）把未过期的摘要注入系统提醒。
+// ============ 天气上下文缓存 ============
+//
+// 天气感知定位为"环境上下文"而非"问答工具"：模型应该随时知道外面什么天气
+// （像知道当前时间一样），而不是被问到才临时查。缓存按评审意见放进存档
+// 全局变量（`GameStatus::global_variables`，键 `weather.cache`），随存档
+// 快照持久化到数据库，重启不丢。缓存在两处被填充——query_weather 工具执行
+// 成功时、后台刷新循环（run_refresh_loop）定时拉取时；今日首聊提醒
+// （first_talk_reminder）从缓存读取。
 
 const WEATHER_TTL: Duration = Duration::from_secs(30 * 60);
 
-struct CachedWeather {
-    summary: String,
-    fetched_at: Instant,
+/// 天气缓存在存档全局变量里的键（与 affection.* 同一命名空间，随存档隔离）。
+const CACHE_VAR_KEY: &str = "weather.cache";
+
+/// 当前 Unix 时间戳（秒）。系统时钟异常时返回 0，只会让缓存被判过期，安全。
+fn unix_now() -> i64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0)
 }
 
-static WEATHER_CACHE: Lazy<Mutex<Option<CachedWeather>>> = Lazy::new(|| Mutex::new(None));
-
-/// 未过期的自然语言天气摘要，如「成都 小雨 21.5°C（体感 20°C）」。
-pub fn cached_summary() -> Option<String> {
-    let cache = WEATHER_CACHE.lock().ok()?;
-    let cached = cache.as_ref()?;
-    (cached.fetched_at.elapsed() <= WEATHER_TTL).then(|| cached.summary.clone())
+/// 从存档全局变量读取未过期的自然语言天气摘要，如「成都 小雨 21.5°C（体感 20°C）」。
+fn cached_summary_in(gs: &GameStatus) -> Option<String> {
+    let cache = gs.get_variable(CACHE_VAR_KEY)?;
+    let summary = cache.get("summary")?.as_str()?.to_string();
+    let fetched_at = cache.get("fetched_at")?.as_i64()?;
+    (unix_now() - fetched_at <= WEATHER_TTL.as_secs() as i64).then_some(summary)
 }
 
-fn store_summary(summary: String) {
-    if let Ok(mut cache) = WEATHER_CACHE.lock() {
-        *cache = Some(CachedWeather {
-            summary,
-            fetched_at: Instant::now(),
-        });
+/// 缓存缺失或已过期（后台刷新循环判断是否需要重新拉取）。
+fn cache_is_stale(gs: &GameStatus) -> bool {
+    let fetched_at = gs
+        .get_variable(CACHE_VAR_KEY)
+        .and_then(|v| v.get("fetched_at"))
+        .and_then(Value::as_i64);
+    match fetched_at {
+        Some(t) => unix_now() - t > WEATHER_TTL.as_secs() as i64,
+        None => true,
     }
+}
+
+fn store_summary_in(gs: &mut GameStatus, summary: String) {
+    gs.set_variable(
+        CACHE_VAR_KEY,
+        json!({ "summary": summary, "fetched_at": unix_now() }),
+    );
 }
 
 /// 读取配置里的手动城市（trim 后非空才视为有效）。
@@ -51,15 +68,22 @@ fn configured_city(config: &AppConfig) -> Option<String> {
 /// 今日首次对话时返回应注入的天气提醒（`None` = 本次不注入）。
 ///
 /// 注入口径（review 定稿）：天气不逐轮进入上下文——模型平时靠 `query_weather`
-/// 工具自查，只有"今日第一句"追加一条带日期的天气提醒。多重门依次为：
-/// 调用方环境允许（剧本/试玩由 generator 侧排除）、缓存有货（后台刷新循环
-/// 维护）、配置开关打开、今天还没注入过。缓存无货时不记账——等到后台刷新
-/// 上来后，当天的后续对话仍能补上这条提醒。
-pub(crate) fn first_talk_reminder(app: &tauri::AppHandle, allowed: bool) -> Option<String> {
+/// 工具自查，只有"今日第一句"由 generator 添加一条带日期的天气台词。多重门
+/// 依次为：调用方环境允许（剧本/试玩由 generator 侧排除）、缓存有货（后台
+/// 刷新循环维护）、配置开关打开、今天还没注入过。缓存无货时不记账——等到
+/// 后台刷新上来后，当天的后续对话仍能补上这条提醒。
+///
+/// 调用方必须已持有 `game_status` 锁并传入守卫（generator 生成上下文时正好
+/// 持锁），本函数内不再重复加锁。
+pub(crate) fn first_talk_reminder(
+    app: &tauri::AppHandle,
+    gs: &GameStatus,
+    allowed: bool,
+) -> Option<String> {
     if !allowed {
         return None;
     }
-    let summary = cached_summary()?;
+    let summary = cached_summary_in(gs)?;
     if !AppConfig::load(app).ok()?.weather_first_talk {
         return None;
     }
@@ -83,16 +107,17 @@ pub(crate) fn first_talk_reminder(app: &tauri::AppHandle, allowed: bool) -> Opti
 
 /// 后台刷新循环：每 5 分钟检查一次，缓存缺失/过期且配置了手动城市时重新拉取。
 /// 没配城市就不刷新——天气感知只在用户主动指定过城市时工作，不做自动定位。
-/// 由 lib.rs 在启动时 spawn。
+/// 由 src-tauri 的 background.rs 在启动时 spawn。
 pub async fn run_refresh_loop(app: tauri::AppHandle) {
     loop {
         let city = AppConfig::load(&app).ok().and_then(|c| configured_city(&c));
 
-        let stale = WEATHER_CACHE
-            .lock()
-            .ok()
-            .and_then(|c| c.as_ref().map(|w| w.fetched_at.elapsed() > WEATHER_TTL))
-            .unwrap_or(true);
+        // 只在判过期/写缓存时短暂持锁，网络请求期间不持有 game_status 锁
+        let stale = {
+            let gs = game_status_handle(&app).await;
+            let gs = gs.lock().await;
+            cache_is_stale(&gs)
+        };
 
         if let (true, Some(city)) = (stale, city) {
             match reqwest::Client::builder()
@@ -100,7 +125,11 @@ pub async fn run_refresh_loop(app: tauri::AppHandle) {
                 .build()
             {
                 Ok(client) => match fetch_summary_for_city(&client, &city).await {
-                    Ok(summary) => store_summary(summary),
+                    Ok(summary) => {
+                        let gs = game_status_handle(&app).await;
+                        let mut guard = gs.lock().await;
+                        store_summary_in(&mut guard, summary);
+                    },
                     Err(e) => tracing::warn!("天气缓存刷新失败: {e}"),
                 },
                 Err(e) => tracing::warn!("天气客户端创建失败: {e}"),
@@ -282,7 +311,10 @@ impl Tool for WeatherTool {
         let code = current["weather_code"].as_i64().unwrap_or(-1);
 
         // 成功的查询同时喂给上下文缓存：模型之后没调工具也"知道"天气
-        store_summary(format_summary(&city, current));
+        let summary = format_summary(&city, current);
+        let gs = game_status_handle(&app).await;
+        let mut guard = gs.lock().await;
+        store_summary_in(&mut guard, summary);
 
         Ok(json!({
             "city": city,
