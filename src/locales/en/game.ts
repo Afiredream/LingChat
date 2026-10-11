@@ -55,7 +55,7 @@ export default {
     availableAmbient: "Available Ambient Sounds",
     spectrum: {
       title: "Audio Spectrum",
-      hint: "Samples the background music and ambient sounds in real time, shown at the bottom right",
+      hint: "Samples the background music and ambient sounds in real time, shown at the bottom right; in pet mode it rings the avatar",
       palette: "Palette",
       styleMirror: "Mirror",
       styleBars: "Bars",

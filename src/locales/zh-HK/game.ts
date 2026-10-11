@@ -55,7 +55,7 @@ export default {
     availableAmbient: "可用環境音",
     spectrum: {
       title: "音頻頻譜",
-      hint: "實時採集播緊嘅背景音樂同環境音，顯示喺右下角",
+      hint: "實時採集播緊嘅背景音樂同環境音，喺主界面右下角顯示；桌寵模式下顯示成頭像外圈嘅圓環",
       palette: "配色",
       styleMirror: "鏡像",
       styleBars: "柱狀",

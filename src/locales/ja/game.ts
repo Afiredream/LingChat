@@ -54,7 +54,7 @@ export default {
     availableAmbient: "利用可能な環境音",
     spectrum: {
       title: "オーディオスペクトラム",
-      hint: "再生中のBGMと環境音をリアルタイムで取得し、右下に表示します",
+      hint: "再生中のBGMと環境音をリアルタイムで取得し、右下に表示します。ペットモードではアバターの外側にリング状に表示します",
       palette: "配色",
       styleMirror: "ミラー",
       styleBars: "バー",
