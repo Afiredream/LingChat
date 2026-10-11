@@ -360,29 +360,24 @@ export default {
     },
     fields: {
       llm: {
-        output_sec_lang: "LLM_OUTPUT_SEC_LANG — 是否允许输出第二语言（关闭后仅输出中文）",
-        consumers: "COMSUMERS — 并发消费者数量（增大可加速流式输出，默认 3）",
+        output_sec_lang: "是否允许输出第二语言（关闭后仅输出中文）",
+        consumers: "并发消费者数量（增大可加速流式输出，默认 3）",
         timeout_secs: "LLM 请求空闲超时（秒）— 首次响应及流式相邻事件最长等待时间（10–3600）",
-        no_emotion_limit_prompt:
-          "NO_EMOTION_LIMIT_PROMPT — 解除 emotion 数量限制（可能增加 token 消耗）",
+        no_emotion_limit_prompt: "解除 emotion 数量限制（可能增加 token 消耗）",
       },
       translate: {
-        enable: "ENABLE_TRANSLATE — 启用 AI 翻译（将中文对话翻译为第二语言）",
+        enable: "启用 AI 翻译（将中文对话翻译为第二语言）",
       },
       features: {
-        enable_time_sense: "USE_TIME_SENSE — 启用时间感知（根据上下文时间添加系统提醒）",
-        enable_emotion_classifier:
-          "ENABLE_EMOTION_CLASSIFIER — 启用情感分类器（ONNX 模型，用于自动标注对话 emotion）",
-        use_persistent_memory: "USE_PERSISTENT_MEMORY — 开启后记忆会自动压缩，保存后需重启生效",
-        memory_update_interval:
-          "MEMORY_UPDATE_INTERVAL — 触发摘要的可见台词数（1–10000，默认 250）",
-        memory_recent_window:
-          "MEMORY_RECENT_WINDOW — 压缩后保留的角色可见台词数（0–10000，默认 30）",
+        enable_time_sense: "启用时间感知（根据上下文时间添加系统提醒）",
+        enable_emotion_classifier: "启用情感分类器（ONNX 模型，用于自动标注对话 emotion）",
+        use_persistent_memory: "开启后记忆会自动压缩，保存后需重启生效",
+        memory_update_interval: "触发摘要的可见台词数（1–10000，默认 250）",
+        memory_recent_window: "压缩后保留的角色可见台词数（0–10000，默认 30）",
         memory_inject_continue_user:
-          "MEMORY_INJECT_CONTINUE_USER — 上下文窗口内没有玩家（user）消息时（工具调用挤满窗口等情况），裁切到下一条 assistant 并在其前面注入一条 user「继续」，兼容要求首条消息为 user 的 provider（如 Gemini）；关闭则只裁切、不注入",
-        auto_save_enabled: "AUTO_SAVE_ENABLED — 是否启用自动存档（关闭后定时与退出存档均不再写入）",
-        auto_save_interval_secs:
-          "AUTO_SAVE_INTERVAL_SECS — 自动存档间隔（秒，30–3600，默认 300，改后即时生效）",
+          "上下文窗口内没有玩家（user）消息时（工具调用挤满窗口等情况），裁切到下一条 assistant 并在其前面注入一条 user「继续」，兼容要求首条消息为 user 的 provider（如 Gemini）；关闭则只裁切、不注入",
+        auto_save_enabled: "是否启用自动存档（关闭后定时与退出存档均不再写入）",
+        auto_save_interval_secs: "自动存档间隔（秒，30–3600，默认 300，改后即时生效）",
       },
       tts: {
         simple_vits_api_url: "Simple-Vits-API 地址（VITS 适配器）",
@@ -406,29 +401,24 @@ export default {
           "填入你的 GitHub Token（无需任何权限，仅用于调用 GraphQL API）。留空使用 REST API，无法获取独立 upvote 数（会用 👍 表情数代替）。Token 创建地址：https://github.com/settings/tokens",
       },
       log: {
-        enable: "LOG_ENABLE — 是否将运行日志写入文件（位于 data/log/app/ 目录）",
-        retention_days: "LOG_RETENTION_DAYS — 日志文件保留天数，超过的旧文件在启动时自动清理",
-        llm_request_body:
-          "LOG_LLM_REQUEST_BODY — 记录每次 LLM 请求的完整请求体 JSON 到 data/log/llm/ 目录（默认关闭）",
-        genai_debug:
-          "LOG_GENAI_DEBUG — 开启 genai SDK 的调试日志（含请求/响应细节，保存后即时生效，默认关闭）",
+        enable: "是否将运行日志写入文件（位于 data/log/app/ 目录）",
+        retention_days: "日志文件保留天数，超过的旧文件在启动时自动清理",
+        llm_request_body: "记录每次 LLM 请求的完整请求体 JSON 到 data/log/llm/ 目录（默认关闭）",
+        genai_debug: "开启 genai SDK 的调试日志（含请求/响应细节，保存后即时生效，默认关闭）",
       },
       display: {
-        disable_splash_animation:
-          "DISABLE_SPLASH_ANIMATION — 关闭首次启动的开屏动画（猫爪加载动画）",
+        disable_splash_animation: "关闭首次启动的开屏动画（猫爪加载动画）",
       },
-      ENABLE_PROACTIVE_SYSTEM: "ENABLE_PROACTIVE_SYSTEM — 是否启用主动对话系统",
-      MAX_PROACTIVE_TIMES: "MAX_PROACTIVE_TIMES — 在用户响应之前，能主动对话的次数",
-      ENABLE_VISUAL_PRECEPTION:
-        "ENABLE_VISUAL_PRECEPTION — 是否允许主动视觉感知桌面画面（偷看屏幕）",
-      SCREEN_WEIGHT: "SCREEN_WEIGHT — 视觉模式触发权重（越大越容易偷看屏幕聊天，默认 30）",
-      ENABLE_TOPIC_CREATER: "ENABLE_TOPIC_CREATER — 允许自主寻找并开启新话题",
-      TOPIC_WEIGHT: "TOPIC_WEIGHT — 随机话题触发权重（默认 60）",
-      ENABLE_TODO_PRECEPTION: "ENABLE_TODO_PRECEPTION — 允许在闲暇时自动读取未完成 TODO 并温和提醒",
-      TODO_WEIGHT: "TODO_WEIGHT — TODO 提醒触发权重（默认 10）",
-      ENABLE_SCHEDULE_REMINDER: "ENABLE_SCHEDULE_REMINDER — 启用强日程日程报时弹窗提醒",
-      ENABLE_IMPORTANT_DAY_REMINDER:
-        "ENABLE_IMPORTANT_DAY_REMINDER — 启用重要节日与特殊日子暖心提醒",
+      ENABLE_PROACTIVE_SYSTEM: "是否启用主动对话系统",
+      MAX_PROACTIVE_TIMES: "在用户响应之前，能主动对话的次数",
+      ENABLE_VISUAL_PRECEPTION: "是否允许主动视觉感知桌面画面（偷看屏幕）",
+      SCREEN_WEIGHT: "视觉模式触发权重（越大越容易偷看屏幕聊天，默认 30）",
+      ENABLE_TOPIC_CREATER: "允许自主寻找并开启新话题",
+      TOPIC_WEIGHT: "随机话题触发权重（默认 60）",
+      ENABLE_TODO_PRECEPTION: "允许在闲暇时自动读取未完成 TODO 并温和提醒",
+      TODO_WEIGHT: "TODO 提醒触发权重（默认 10）",
+      ENABLE_SCHEDULE_REMINDER: "启用强日程日程报时弹窗提醒",
+      ENABLE_IMPORTANT_DAY_REMINDER: "启用重要节日与特殊日子暖心提醒",
     },
   },
   workshop: {
