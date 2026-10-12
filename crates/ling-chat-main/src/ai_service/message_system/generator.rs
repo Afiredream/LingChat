@@ -34,8 +34,9 @@ use crate::ai_service::tools::tool_loop::stream_with_tool_loop;
 use crate::ai_service::translator::Translator;
 use crate::ai_service::types::{GameLine, LineAttributeExt, LineBase, LlmMessage};
 use crate::api::data_dir;
+use crate::config::AppConfig;
 use crate::db::entities::line::LineAttribute;
-use crate::utils::prompt::PromptRole;
+use crate::utils::prompt::{PromptRole, RoundReply, correction_texts, scan_reply_shape};
 
 /// MessageGenerator 的业务调用来源。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -121,9 +122,9 @@ impl MessageGenerator {
         // 3. 生成循环（God Agent 激活时可能多轮）
         let mut accumulated = String::new();
         let mut consecutive_npc_rounds: usize = 0;
-        // 每轮真正落地的 assistant 台词条数，供回复后处理（台词数量纠偏）使用。
-        // 按轮记而不是统计整轮 accumulated：多人模式下它是多个角色输出的拼接。
-        let mut round_lines: Vec<usize> = Vec::new();
+        // 每轮的纠偏输入，供回复后处理使用。按轮记而不是统计整轮 accumulated：
+        // 多人模式下它是多个角色输出的拼接。
+        let mut round_replies: Vec<RoundReply> = Vec::new();
         let original_msg = user_message.as_deref().unwrap_or_default();
 
         loop {
@@ -147,7 +148,7 @@ impl MessageGenerator {
                 .execute_pipeline(context, original_msg, round_msg_seq)
                 .await?;
             accumulated.push_str(&round_acc);
-            round_lines.push({
+            let landed_lines = {
                 let gs = self.deps.game_status.lock().await;
                 gs.line_list[before_lines.min(gs.line_list.len())..]
                     .iter()
@@ -158,6 +159,11 @@ impl MessageGenerator {
                             && l.base.sender_role_id.is_some()
                     })
                     .count()
+            };
+            // 形态取自模型原始输出，落地条数取自台词表：翻译覆写只影响行、不影响原文
+            round_replies.push(RoundReply {
+                landed_lines,
+                shapes: scan_reply_shape(&round_acc),
             });
 
             // 后处理：仅第一轮清理 temp_message
@@ -180,10 +186,10 @@ impl MessageGenerator {
         self.maybe_evaluate_affection().await;
 
         // 回复后处理扩展点（顺序排在好感度评估之后，避免刚插入的提示混进评估快照）：
-        // 新增的回复后处理一律加在 `maybe_correct_reply_length` 旁边——轻量动作
+        // 新增的回复后处理一律加在 `maybe_correct_reply_shape` 旁边——轻量动作
         // （插台词等）直接 await，需要 LLM 的动作 spawn 到后台，失败只 warn，
         // 绝不能影响已经呈现给用户的回复。
-        self.maybe_correct_reply_length(&round_lines).await;
+        self.maybe_correct_reply_shape(&round_replies).await;
 
         Ok(accumulated)
     }
@@ -504,13 +510,14 @@ impl MessageGenerator {
         });
     }
 
-    /// 回复台词数量纠偏：某轮回复的台词条数超出当前档位的容忍区间时，
-    /// 插一条系统提示台词提醒模型下一次增/减。
+    /// 回复纠偏：上一轮回复的格式要素（情绪标签 / 正文 / 日语翻译）缺失、
+    /// 台词数量越界、动作分布异常或情绪标签过长时，各插一条系统提示台词，
+    /// 提醒模型下一轮修正。
     ///
     /// 只对自由对话 / 主动对话生效：入场问候天然只有一两句，会被「正常」档误判过短；
     /// 剧本模式的节奏由剧本作者控制，不插提示（判据与好感度评估一致）。
-    /// 这里只追加一条台词，直接 await；插台词失败只记日志，不能反向报错。
-    async fn maybe_correct_reply_length(&self, round_lines: &[usize]) {
+    /// 这里只追加台词，直接 await；插台词失败只记日志，不能反向报错。
+    async fn maybe_correct_reply_shape(&self, round_replies: &[RoundReply]) {
         if !matches!(
             self.deps.source,
             GeneratorSource::UserChat | GeneratorSource::Proactive
@@ -518,37 +525,49 @@ impl MessageGenerator {
             return;
         }
 
+        // 角色系统的第二语言输出开关决定系统提示词里有没有「日语翻译」那一行，
+        // 缺了它才是格式错误（配置读取与天气首聊同款，每轮一次、代价可忽略）
+        let expect_translation = AppConfig::load(&self.deps.app)
+            .map(|config| config.llm_output_sec_lang)
+            .unwrap_or(false);
+
         let mut gs = self.deps.game_status.lock().await;
         if gs.script_status.is_some() {
             return;
         }
 
+        // 每类问题只取首个命中的轮次（多人模式下一次回复含多个角色的输出，
+        // 逐轮插入会把提示堆一片）；什么都没产出的轮次（模型只调了工具）不参与判据。
         let mode = gs.reply_length_mode();
-        // 自由档不检查；条数为 0 的轮次是「模型没产出任何台词」的兜底路径，不纠偏
-        let Some(text) = round_lines
+        let texts = round_replies
             .iter()
-            .filter(|count| **count > 0)
-            .find_map(|count| mode.correction_text(*count))
-        else {
-            return;
-        };
+            .filter(|round| round.landed_lines > 0 || !round.shapes.is_empty())
+            .find_map(|round| {
+                let texts = correction_texts(mode, round, expect_translation);
+                (!texts.is_empty()).then_some(texts)
+            })
+            .unwrap_or_default();
 
         // 同一条提示紧邻重复就不再插：跨过本轮刚产出的台词回头看一行，
         // 命中即说明上一轮已经提醒过同样的问题（隔轮重复是有意的：模型不听就该再提醒）
-        let content = PromptRole::System.build_prompt(&text);
-        let lookback = round_lines.iter().sum::<usize>() + 2;
-        let duplicated = gs
-            .line_list
+        let lookback = round_replies
             .iter()
-            .rev()
-            .take(lookback)
-            .any(|l| matches!(l.attribute(), LineAttribute::User) && l.base.content == content);
-        if duplicated {
-            return;
-        }
+            .map(|round| round.landed_lines)
+            .sum::<usize>()
+            + 2;
+        for text in texts {
+            let content = PromptRole::System.build_prompt(&text);
+            let duplicated =
+                gs.line_list.iter().rev().take(lookback).any(|l| {
+                    matches!(l.attribute(), LineAttribute::User) && l.base.content == content
+                });
+            if duplicated {
+                continue;
+            }
 
-        if let Err(e) = gs.add_system_hint_line(&self.deps.db, &text).await {
-            tracing::warn!("[ReplyLength] 写入台词数量纠偏提示失败: {e:#}");
+            if let Err(e) = gs.add_system_hint_line(&self.deps.db, &text).await {
+                tracing::warn!("[ReplyShape] 写入回复形态纠偏提示失败: {e:#}");
+            }
         }
     }
 
