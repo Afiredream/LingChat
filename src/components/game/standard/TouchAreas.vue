@@ -24,11 +24,6 @@
           vector-effect="non-scaling-stroke"
           class="polygon-flow"
         />
-        <polygon
-          :points="toPoints(polygon)"
-          vector-effect="non-scaling-stroke"
-          class="polygon-shape"
-        />
       </template>
     </svg>
   </div>
@@ -189,12 +184,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 @reference "tailwindcss";
-
-.polygon-shape {
-  fill: none;
-  stroke: white;
-  stroke-width: 0;
-}
 
 /* 触摸区域高亮整体不用 filter。原实现用一条四层 drop-shadow 链并逐帧改它的
    半径，每帧都要重跑滤镜图；即使改成常量，单次栅格化这条链也仍有一次可见的
