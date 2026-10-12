@@ -3,7 +3,7 @@ use std::fs;
 
 use async_trait::async_trait;
 use serde_json::{Value, json};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 use crate::AppState;
 use crate::ai_service::proactive_system::types::{TodoGroup, TodoItem, UserScheduleSettings};
@@ -40,7 +40,9 @@ fn save_schedule_settings(settings: &UserScheduleSettings) -> Result<(), String>
 }
 
 /// 重载主动对话系统的日程提醒配置（与 api/schedule.rs save_schedules 一致）。
+/// 顺带广播一次改动：AI 写日程走的是这条路径，不广播的话 TODO 小组件看不到。
 async fn reload_proactive(app: &AppHandle) {
+    let _ = app.emit("schedules:changed", ());
     let state = app.state::<AppState>();
     if let Some(proactive) = &state.proactive_system {
         let mut sys = proactive.lock().await;

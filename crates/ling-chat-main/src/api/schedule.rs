@@ -1,6 +1,6 @@
 use crate::AppState;
 use crate::ai_service::proactive_system::types::UserScheduleSettings;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 #[tauri::command]
 pub async fn get_schedules() -> Result<UserScheduleSettings, String> {
@@ -58,6 +58,9 @@ pub async fn save_schedules(app: AppHandle, data: UserScheduleSettings) -> Resul
         "[ScheduleAPI] Schedules saved successfully at {:?}",
         schedules_path
     );
+
+    // 通知其它窗口（TODO 小组件）重新拉取，否则它要等到自己再次打开才看到改动
+    let _ = app.emit("schedules:changed", ());
 
     // Reload settings in the proactive system
     if let Some(proactive) = &state.proactive_system {

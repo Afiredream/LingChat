@@ -242,7 +242,7 @@
         <select
           v-model="formData.remindBeforeMinutes"
           :disabled="!formData.deadline"
-          class="min-w-0 flex-1 rounded-xl border-none bg-transparent px-2 py-2 text-sm text-white [color-scheme:dark] outline-none disabled:text-white/30"
+          class="select-dark min-w-0 flex-1 rounded-xl border-none bg-transparent px-2 py-2 text-sm text-white [color-scheme:dark] outline-none disabled:text-white/30"
         >
           <option v-for="opt in reminderOptions" :key="String(opt.value)" :value="opt.value">
             {{ opt.label }}

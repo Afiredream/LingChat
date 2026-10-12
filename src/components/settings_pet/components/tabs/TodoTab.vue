@@ -496,7 +496,7 @@
               v-model="formData.remindBeforeMinutes"
               :disabled="!formData.deadline"
               class="min-w-0 flex-1 border-none bg-transparent text-sm outline-none disabled:text-slate-400"
-              :class="isDarkMode ? 'text-slate-200' : 'text-slate-700'"
+              :class="[isDarkMode ? 'select-dark text-slate-200' : 'text-slate-700']"
             >
               <option v-for="opt in reminderOptions" :key="String(opt.value)" :value="opt.value">
                 {{ opt.label }}

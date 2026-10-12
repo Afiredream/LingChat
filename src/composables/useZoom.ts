@@ -103,7 +103,8 @@ export function useZoom(): void {
   // 缩放：applyZoom 的尺寸补偿会把 #app 布局盒改成「视口 / z」，而窗口尺寸并没有跟着变，
   // 结果是布局坐标系与视口不一致 —— inset-x-0 的元素会比视口宽，右侧与底部被窗口裁掉。
   // 气泡窗（/bubble）同样属于桌宠，漏掉它就会出现「整个气泡窗被裁」。
-  const ownScalingRoutes = new Set(["/pet", "/bubble"]);
+  // TODO 小组件是另一个尺寸独立于主窗口的窗口，同理必须豁免。
+  const ownScalingRoutes = new Set(["/pet", "/bubble", "/todo-widget"]);
   const effectiveZoom = () => (ownScalingRoutes.has(route.path) ? ZOOM_DEFAULT : currentZoom.value);
 
   // 初始化 + 进出桌宠时都按当前路由重新应用（桌宠/气泡窗里恒为 100%）
