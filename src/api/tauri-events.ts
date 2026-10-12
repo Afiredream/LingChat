@@ -24,6 +24,7 @@ import type { VadEvent } from "../api/services/asr";
 import type { SceneInfo } from "./services/scene";
 import type { WebInitData } from "./services/game-info";
 import { getAffection, type AffectionChangedPayload } from "./services/affection";
+import { sendSystemNotification } from "@/composables/useSedentaryReminder";
 
 function asEvent(
   payload: unknown,
@@ -273,6 +274,30 @@ export function initializeTauriEventListeners() {
       console.warn("[Tauri] 保存 tts:cleanup 状态到 localStorage 失败:", e);
     }
   });
+
+  // 待办截止提醒的「弹窗消息提醒」方式：后端只给结构化数据，文案在此按当前语言组装
+  listen<{ title: string; todoText: string; minutesBefore: number }>(
+    "proactive:remind",
+    (event) => {
+      const { title, todoText, minutesBefore } = event.payload;
+      const body =
+        minutesBefore >= 1440
+          ? i18n.global.t("stores.proactiveReminder.daysLater", {
+              text: todoText,
+              count: Math.round(minutesBefore / 1440),
+            })
+          : minutesBefore >= 60
+            ? i18n.global.t("stores.proactiveReminder.hoursLater", {
+                text: todoText,
+                count: Math.round(minutesBefore / 60),
+              })
+            : i18n.global.t("stores.proactiveReminder.minutesLater", {
+                text: todoText,
+                count: minutesBefore,
+              });
+      void sendSystemNotification(title, body);
+    },
+  );
 
   // === ASR events ===
   // 注意：useAsrStore() 必须在回调内调用 —— initializeTauriEventListeners

@@ -735,6 +735,37 @@ pub fn build_config_tree(app: &AppHandle) -> ConfigTree {
                         description: "启用重要节日与特殊日子暖心提醒".to_string(),
                         setting_type: "bool".to_string(),
                     },
+                    ConfigSetting {
+                        key: keys::FORCE_SCHEDULE_REMINDER.to_string(),
+                        value: read_setting(
+                            app,
+                            keys::FORCE_SCHEDULE_REMINDER,
+                            &proactive_defaults.force_schedule_reminder.to_string(),
+                        ),
+                        description: "日程到点时无视主动对话总开关，强制提醒".to_string(),
+                        setting_type: "bool".to_string(),
+                    },
+                    ConfigSetting {
+                        key: keys::FORCE_TODO_REMINDER.to_string(),
+                        value: read_setting(
+                            app,
+                            keys::FORCE_TODO_REMINDER,
+                            &proactive_defaults.force_todo_reminder.to_string(),
+                        ),
+                        description: "待办截止提醒无视主动对话总开关，强制提醒".to_string(),
+                        setting_type: "bool".to_string(),
+                    },
+                    ConfigSetting {
+                        key: keys::TODO_REMINDER_STYLE.to_string(),
+                        value: read_setting(
+                            app,
+                            keys::TODO_REMINDER_STYLE,
+                            &proactive_defaults.todo_reminder_style,
+                        ),
+                        description: "待办截止提醒的方式：role 角色提醒 / toast 弹窗消息提醒"
+                            .to_string(),
+                        setting_type: "text".to_string(),
+                    },
                 ],
             },
         );

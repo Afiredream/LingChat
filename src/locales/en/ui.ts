@@ -374,6 +374,11 @@ export default {
     priorityLabel: "Priority:",
     newGroup: "New Task Group",
     newTask: "New To-Do Task",
+    editTask: "Edit To-Do Task",
+    reminderOff: "No reminder",
+    reminderMinutes: "{count} min before",
+    reminderHours: "{count} h before",
+    reminderDays: "{count} d before",
   },
   schedulePage: {
     emptyGroups: "No schedule themes yet — click the top-right button to create one!",
@@ -390,6 +395,9 @@ export default {
     save: "Save",
     success: "Saved successfully",
     error: "Error: {message}",
+    todoReminderStyle: "To-Do reminder style",
+    todoReminderStyleRole: "Character speaks",
+    todoReminderStyleToast: "System notification",
   },
   calendarPage: {
     yearMonth: "{month}/{year}",

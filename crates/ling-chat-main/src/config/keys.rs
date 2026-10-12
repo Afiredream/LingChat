@@ -119,6 +119,12 @@ pub const ENABLE_TODO_PRECEPTION: &str = "ENABLE_TODO_PRECEPTION";
 pub const TODO_WEIGHT: &str = "TODO_WEIGHT";
 pub const ENABLE_SCHEDULE_REMINDER: &str = "ENABLE_SCHEDULE_REMINDER";
 pub const ENABLE_IMPORTANT_DAY_REMINDER: &str = "ENABLE_IMPORTANT_DAY_REMINDER";
+/// 日程到点提醒是否无视主动对话总开关，强制送达。
+pub const FORCE_SCHEDULE_REMINDER: &str = "FORCE_SCHEDULE_REMINDER";
+/// 待办截止提醒是否无视主动对话总开关，强制送达。
+pub const FORCE_TODO_REMINDER: &str = "FORCE_TODO_REMINDER";
+/// 待办截止提醒的方式："role" 角色开口 / "toast" 系统通知。
+pub const TODO_REMINDER_STYLE: &str = "TODO_REMINDER_STYLE";
 
 // ========== 上帝 Agent（God Agent）多人对话 ==========
 pub const GOD_AGENT_MAX_CONSECUTIVE_NPC: &str = "god_agent.max_consecutive_npc";

@@ -20,6 +20,12 @@ pub struct ProactiveConfig {
     pub todo_weight: f64,
     pub enable_schedule_reminder: bool,
     pub enable_important_day_reminder: bool,
+    /// 日程到点提醒是否无视主动对话总开关。
+    pub force_schedule_reminder: bool,
+    /// 待办截止提醒是否无视主动对话总开关。
+    pub force_todo_reminder: bool,
+    /// 待办截止提醒方式："toast" = 系统通知，其余值 = 角色提醒。
+    pub todo_reminder_style: String,
 }
 
 // ========== Default 实现（单一真相源） ==========
@@ -37,6 +43,9 @@ impl Default for ProactiveConfig {
             todo_weight: 10.0,
             enable_schedule_reminder: true,
             enable_important_day_reminder: true,
+            force_schedule_reminder: true,
+            force_todo_reminder: true,
+            todo_reminder_style: "role".to_string(),
         }
     }
 }
@@ -85,6 +94,18 @@ impl ProactiveConfig {
                 .unwrap_or(default)
         };
 
+        let get_string = |key: &str, default: &str| -> String {
+            store
+                .as_ref()
+                .and_then(|s| s.get(key))
+                .and_then(|v| match v {
+                    Value::String(s) => Some(s.clone()),
+                    Value::Number(n) => Some(n.to_string()),
+                    _ => None,
+                })
+                .unwrap_or_else(|| default.to_string())
+        };
+
         Self {
             enable_proactive_system: get_bool(
                 keys::ENABLE_PROACTIVE_SYSTEM,
@@ -113,6 +134,15 @@ impl ProactiveConfig {
             enable_important_day_reminder: get_bool(
                 keys::ENABLE_IMPORTANT_DAY_REMINDER,
                 default.enable_important_day_reminder,
+            ),
+            force_schedule_reminder: get_bool(
+                keys::FORCE_SCHEDULE_REMINDER,
+                default.force_schedule_reminder,
+            ),
+            force_todo_reminder: get_bool(keys::FORCE_TODO_REMINDER, default.force_todo_reminder),
+            todo_reminder_style: get_string(
+                keys::TODO_REMINDER_STYLE,
+                &default.todo_reminder_style,
             ),
         }
     }

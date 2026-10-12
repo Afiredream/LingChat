@@ -347,6 +347,11 @@ export default {
     priorityLabel: "優先級:",
     newGroup: "新增任務組",
     newTask: "新增待辦任務",
+    editTask: "編輯待辦任務",
+    reminderOff: "唔提醒",
+    reminderMinutes: "提早 {count} 分鐘",
+    reminderHours: "提早 {count} 小時",
+    reminderDays: "提早 {count} 日",
   },
   schedulePage: {
     emptyGroups: "仲未有日程主題，撳右上角新增一個啦",
@@ -363,6 +368,9 @@ export default {
     save: "儲存",
     success: "已儲存成功",
     error: "錯誤: {message}",
+    todoReminderStyle: "待辦提醒方式",
+    todoReminderStyleRole: "角色提醒",
+    todoReminderStyleToast: "彈窗訊息提醒",
   },
   calendarPage: {
     yearMonth: "{year}年 {month}月",

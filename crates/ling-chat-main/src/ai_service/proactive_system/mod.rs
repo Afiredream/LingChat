@@ -31,7 +31,7 @@ use delivery_evaluator::DeliveryEvaluator;
 use interest_manager::InterestManager;
 use schedule_manager::ScheduleManager;
 use strategy_dispatcher::StrategyDispatcher;
-use types::{IntentType, PendingIntent, ProactivePrompt, UserScheduleSettings};
+use types::{PendingIntent, ProactivePrompt, UserScheduleSettings};
 use visual_monitor::VisualMonitor;
 
 pub struct ProactiveSystem {
@@ -129,13 +129,23 @@ impl ProactiveSystem {
                     (sys.config.enable_proactive_system, is_script_active)
                 };
 
-                if !enabled {
-                    // tracing::info!("[ProactiveSystem] Disabled via settings, skipping...");
+                if is_script_active {
+                    // tracing::info!("[ProactiveSystem] Script is currently running, bypassing proactive talk to avoid collision.");
                     continue;
                 }
 
-                if is_script_active {
-                    // tracing::info!("[ProactiveSystem] Script is currently running, bypassing proactive talk to avoid collision.");
+                // 到点提醒（日程闹钟 / 待办截止）有意跑在总开关判断之前：
+                // 用户关掉主动对话后，依然应当收到自己设过的提醒。
+                match Self::run_reminder_check(sys_clone.clone()).await {
+                    Ok(true) => continue,
+                    Ok(false) => {},
+                    Err(e) => {
+                        tracing::error!("[ProactiveSystem] Error running reminder check: {:?}", e)
+                    },
+                }
+
+                if !enabled {
+                    // tracing::info!("[ProactiveSystem] Disabled via settings, skipping...");
                     continue;
                 }
 
@@ -350,6 +360,75 @@ impl ProactiveSystem {
     }
 
     // ============================================================
+    // run_reminder_check（到点提醒，独立于主动对话总开关）
+    // ============================================================
+
+    /// 检查日程闹钟与待办截止提醒，命中即立即投放。
+    ///
+    /// 与 run_cycle 分开的原因：它有意绕开主动对话总开关，也绕开 `can_deliver`
+    /// 投放闸门——到点提醒晚到就失去意义，进「小本本」暂存（Alarm TTL 30 分钟）
+    /// 等于没提醒。剧本进行中由调用方负责跳过。
+    ///
+    /// 返回 true 表示本轮已投放，调用方应跳过 run_cycle，避免同一轮再闲聊一句。
+    async fn run_reminder_check(system_arc: Arc<Mutex<Self>>) -> anyhow::Result<bool> {
+        let mut sys = system_arc.lock().await;
+
+        let settings_snap = {
+            let snap = sys.settings.read().await;
+            snap.clone()
+        };
+
+        let (user_name, role_name) = {
+            let svc = sys.ai_service.lock().await;
+            let gs = svc.game_status.lock().await;
+            let role_name = gs
+                .current_role_id
+                .and_then(|rid| gs.role_manager.get_loaded(rid))
+                .and_then(|role| role.display_name.clone());
+            (gs.player.user_name.clone(), role_name)
+        };
+
+        // ─── 日程闹钟 ───
+        if sys.config.enable_schedule_reminder
+            && (sys.config.enable_proactive_system || sys.config.force_schedule_reminder)
+        {
+            if let Some(raw_prompt) = sys
+                .schedule_manager
+                .check_schedule_reminder(&user_name, &settings_snap)
+            {
+                tracing::info!("[ProactiveSystem] Schedule alarm delivering immediately");
+                let formatted = PromptRole::System.build_prompt(&raw_prompt);
+                sys.deliver(formatted, None).await?;
+                return Ok(true);
+            }
+        }
+
+        // ─── 待办截止提醒 ───
+        if sys.config.enable_proactive_system || sys.config.force_todo_reminder {
+            if let Some(reminder) = sys.schedule_manager.check_todo_reminder(&settings_snap) {
+                if sys.config.todo_reminder_style == "toast" {
+                    events::emit_proactive_remind(
+                        &sys.app,
+                        role_name.unwrap_or_else(|| "LingChat".to_string()),
+                        reminder.todo_text,
+                        reminder.minutes_before,
+                    );
+                } else {
+                    let raw_prompt = format!(
+                        "{{你想起来 {} 有件事快到期了：'{}'，还有 {} 分钟就到截止时间。提醒他一下吧？}}",
+                        user_name, reminder.todo_text, reminder.minutes_before
+                    );
+                    let formatted = PromptRole::System.build_prompt(&raw_prompt);
+                    sys.deliver(formatted, None).await?;
+                }
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    // ============================================================
     // run_cycle（核心流程）
     // ============================================================
 
@@ -378,45 +457,15 @@ impl ProactiveSystem {
             snap.clone()
         };
 
-        // ─── 2. 感知（提前到这里，供 Alarm 的 evaluate 使用）───
+        // ─── 2. 感知 ───
         let perception = sys.activity_monitor.get_user_status();
 
-        // ─── 3. 日程警报（跳过兴趣累积，但走 evaluate 闸门）───
-        if sys.config.enable_schedule_reminder {
-            let user_name = {
-                let svc = sys.ai_service.lock().await;
-                let gs = svc.game_status.lock().await;
-                gs.player.user_name.clone()
-            };
-            if let Some(raw_prompt) = sys
-                .schedule_manager
-                .check_schedule_reminder(&user_name, &settings_snap)
-            {
-                let formatted = PromptRole::System.build_prompt(&raw_prompt);
-                if DeliveryEvaluator::can_deliver(IntentType::Alarm, &perception, sys.can_deliver) {
-                    tracing::info!(
-                        "[ProactiveSystem] Alarm triggered, evaluate passed, delivering"
-                    );
-                    sys.deliver(formatted, None).await?;
-                } else {
-                    tracing::info!("[ProactiveSystem] Alarm triggered, evaluate failed, stashing");
-                    sys.pending_intents.push(PendingIntent {
-                        prompt: formatted,
-                        intent_type: IntentType::Alarm,
-                        transient_image: None,
-                        triggered_at: std::time::Instant::now(),
-                    });
-                }
-                return Ok(());
-            }
-        }
-
-        // ─── 4. 兴趣累积 ───
+        // ─── 3. 兴趣累积 ───
         sys.interest_manager.update_interest();
         sys.interest_manager
             .set_status_mod(perception.interest_modifier);
 
-        // ─── 5. 触发检查 ───
+        // ─── 4. 触发检查 ───
         if !sys.interest_manager.should_trigger_talk() {
             return Ok(());
         }

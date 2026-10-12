@@ -355,6 +355,11 @@ export default {
     priorityLabel: "优先级:",
     newGroup: "新建任务组",
     newTask: "新建待办任务",
+    editTask: "编辑待办任务",
+    reminderOff: "不提醒",
+    reminderMinutes: "提前 {count} 分钟",
+    reminderHours: "提前 {count} 小时",
+    reminderDays: "提前 {count} 天",
   },
   schedulePage: {
     emptyGroups: "还没有日程主题，点击右上角新建一个吧",
@@ -371,6 +376,9 @@ export default {
     save: "保存",
     success: "已保存成功",
     error: "错误: {message}",
+    todoReminderStyle: "待办提醒方式",
+    todoReminderStyleRole: "角色提醒",
+    todoReminderStyleToast: "弹窗消息提醒",
   },
   calendarPage: {
     yearMonth: "{year}年 {month}月",

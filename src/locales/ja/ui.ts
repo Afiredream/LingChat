@@ -371,6 +371,11 @@ export default {
     priorityLabel: "優先度:",
     newGroup: "新規タスクグループ",
     newTask: "新規ToDoタスク",
+    editTask: "ToDoタスクを編集",
+    reminderOff: "リマインドしない",
+    reminderMinutes: "{count} 分前に",
+    reminderHours: "{count} 時間前に",
+    reminderDays: "{count} 日前に",
   },
   schedulePage: {
     emptyGroups: "スケジュールテーマがまだありません。右上の新規作成から追加してね",
@@ -387,6 +392,9 @@ export default {
     save: "保存",
     success: "保存しました",
     error: "エラー: {message}",
+    todoReminderStyle: "ToDoのリマインド方法",
+    todoReminderStyleRole: "キャラが声をかける",
+    todoReminderStyleToast: "システム通知",
   },
   calendarPage: {
     yearMonth: "{year}年 {month}月",
