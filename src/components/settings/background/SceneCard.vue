@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      `group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-white/12.5 bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-[20px] backdrop-saturate-180 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:bg-white/15 hover:shadow-[0_12px_40px_rgba(0,0,0,0.15),inset_0_2px_2px_rgba(255,255,255,0.15)] hover:backdrop-blur-[25px] hover:backdrop-saturate-200`,
+      `group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-white/12.5 bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:bg-white/15 hover:shadow-[0_12px_40px_rgba(0,0,0,0.15),inset_0_2px_2px_rgba(255,255,255,0.15)]`,
       selected
         ? `border-2! border-sky-400! shadow-[0_0_12px_rgba(56,189,248,0.5),0_0_3px_rgba(56,189,248,0.8),inset_0_0_8px_rgba(56,189,248,0.15)]`
         : '',
@@ -55,9 +55,7 @@
     </div>
 
     <!-- 信息栏 -->
-    <div
-      class="relative z-2 flex flex-col gap-1 border-t border-white/20 bg-white/15 px-4 py-3 backdrop-blur-[10px]"
-    >
+    <div class="relative z-2 flex flex-col gap-1 border-t border-white/20 bg-white/15 px-4 py-3">
       <span class="truncate font-medium text-white/90 drop-shadow-md">
         {{ scene.scene_name }}
       </span>

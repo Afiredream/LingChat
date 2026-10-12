@@ -25,7 +25,7 @@
         <button
           v-if="currentPage === totalPages"
           type="button"
-          class="group flex min-h-44 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-4 text-white/60 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-(--accent-color) hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-color)"
+          class="group flex min-h-44 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-4 text-white/60 transition-all duration-300 hover:-translate-y-1 hover:border-(--accent-color) hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--accent-color)"
           @click="newCharacterVisible = true"
         >
           <span

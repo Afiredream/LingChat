@@ -146,8 +146,9 @@ textarea {
   padding: 0.625rem 0.75rem;
   font-size: 0.875rem;
   color: #fff;
-  backdrop-filter: blur(20px) saturate(150%);
-  transition: all 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .glass-input:focus {
   outline: none;

@@ -126,7 +126,7 @@
 
       <!-- 音乐控制台 -->
       <div
-        class="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-md max-[640px]:flex-col max-[640px]:gap-2"
+        class="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 max-[640px]:flex-col max-[640px]:gap-2"
       >
         <div
           class="flex w-[60%] items-center justify-between rounded-lg bg-black/20 px-3 py-2 text-sm font-medium text-gray-200 max-[640px]:w-full"
@@ -225,9 +225,7 @@
       </div>
 
       <!-- 音乐列表 -->
-      <div
-        class="mt-4 flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20 backdrop-blur-sm"
-      >
+      <div class="mt-4 flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20">
         <div v-if="filteredMusicList.length === 0" class="py-8 text-center text-sm text-gray-400">
           {{ $t("settings.sound.bgm.empty") }}
         </div>
@@ -330,9 +328,7 @@
           $t("settings.sound.ambient.fileCount", { count: ambientFileList.length })
         }}</span>
       </div>
-      <div
-        class="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20 backdrop-blur-sm"
-      >
+      <div class="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20">
         <div v-if="ambientFileList.length === 0" class="py-4 text-center text-sm text-gray-400">
           {{ $t("settings.sound.ambient.empty") }}
         </div>
@@ -402,9 +398,7 @@
           >{{ uiStore.ambientTracks.length }}/{{ maxAmbientTracks }}</span
         >
       </div>
-      <div
-        class="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20 backdrop-blur-sm"
-      >
+      <div class="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-black/20">
         <div
           v-if="uiStore.ambientTracks.length === 0"
           class="py-4 text-center text-sm text-gray-400"
