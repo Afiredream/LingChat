@@ -164,6 +164,9 @@ export default {
       "Limits consecutive tool-execution rounds in one main-chat reply. One round can contain multiple tool calls.",
     maxToolRoundsUnit: "rounds",
     maxToolRoundsRange: "Range {min}–{max} · Default {default}",
+    toolRagTitle: "Search Tools on Demand",
+    toolRagHint:
+      "Sends only the common tools with each request; when the model needs one, it searches in a sentence first and then calls it, saving the context that every tool description would otherwise occupy. Turn off to send all authorized tools on every request.",
     accessModes: {
       manual: {
         label: "Ask Every Time",
@@ -343,6 +346,7 @@ export default {
     },
     tools: {
       web_search: "Web Search",
+      tool_search: "Search Tools",
       get_current_time: "Current Time",
       schedule_get_all: "View Schedule",
       schedule_add_todo: "Add To-do",

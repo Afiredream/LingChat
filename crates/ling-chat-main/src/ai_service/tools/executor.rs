@@ -14,6 +14,13 @@ use super::registry::ToolRegistry;
 #[derive(Clone, Debug, Default)]
 pub struct ToolContext {
     pub allowed_tools: HashSet<String>,
+    /// 权限矩阵放行的原始工具集，未经 Tool RAG 收窄。
+    ///
+    /// `tool_search` 用它界定「能检索到哪些工具」：检索结果永远不出这个集合，
+    /// 因此收窄工具集不会带来任何权限提升。
+    pub base_allowed: HashSet<String>,
+    /// 当前角色名，用作 Tool RAG 激活缓存的键。
+    pub role_name: Option<String>,
     /// 用于访问 AppState 共享状态的句柄；无宿主环境时为 `None`。
     pub app: Option<AppHandle>,
 }
@@ -21,9 +28,23 @@ pub struct ToolContext {
 impl ToolContext {
     pub fn new(allowed_tools: HashSet<String>) -> Self {
         Self {
+            base_allowed: allowed_tools.clone(),
             allowed_tools,
+            role_name: None,
             app: None,
         }
+    }
+
+    /// 覆盖权限集快照（Tool RAG 开启时 `allowed_tools` 会比它更窄）。
+    pub fn with_base_allowed(mut self, base_allowed: HashSet<String>) -> Self {
+        self.base_allowed = base_allowed;
+        self
+    }
+
+    /// 绑定当前角色名。
+    pub fn with_role_name(mut self, role_name: Option<String>) -> Self {
+        self.role_name = role_name;
+        self
     }
 
     /// 绑定 AppHandle，供工具访问 db / ai_service / game_status 等共享状态。
